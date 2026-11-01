@@ -2,7 +2,7 @@
   "mcpServers": {
     "tampermonkey": {
       "command": "npx",
-      "args": ["-y", "tampermonkey-mcp@latest"]
+      "args": ["-y", "tampermonkey-mcp@0.0.5"]
     }
   }
 }

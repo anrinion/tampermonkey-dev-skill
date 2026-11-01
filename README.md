@@ -33,7 +33,7 @@ npx skills add anrinion/tampermonkey-dev-skill
 ```
 
 In that case the tampermonkey-mcp server is not configured automatically; add it to your agent's MCP
-configuration (command `npx -y tampermonkey-mcp@latest`).
+configuration (command `npx -y tampermonkey-mcp@0.0.5`).
 
 ## Usage
 
