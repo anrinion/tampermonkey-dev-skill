@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "tampermonkey": {
+      "command": "npx",
+      "args": ["-y", "tampermonkey-mcp@latest"]
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "userscripts",
+  "version": "0.1.0",
+  "description": "Develop Tampermonkey userscripts against the real site using tampermonkey-mcp and Claude in Chrome.",
+  "license": "MIT",
+  "keywords": [
+    "tampermonkey",
+    "userscript",
+    "greasemonkey",
+    "browser",
+    "mcp",
+    "claude-in-chrome"
+  ]
+}

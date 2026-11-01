@@ -1,0 +1,14 @@
+{
+  "name": "tampermonkey-dev-skill",
+  "description": "Claude Code plugins for userscript development.",
+  "owner": {
+    "name": "anrinion"
+  },
+  "plugins": [
+    {
+      "name": "userscripts",
+      "source": "./plugins/userscripts",
+      "description": "Develop Tampermonkey userscripts against the real site using tampermonkey-mcp and Claude in Chrome."
+    }
+  ]
+}
