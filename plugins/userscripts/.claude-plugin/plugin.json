@@ -2,6 +2,12 @@
   "name": "userscripts",
   "version": "0.1.0",
   "description": "Develop Tampermonkey userscripts against the real site using tampermonkey-mcp and Claude in Chrome.",
+  "author": {
+    "name": "anrinion",
+    "url": "https://github.com/anrinion"
+  },
+  "homepage": "https://github.com/anrinion/tampermonkey-dev-skill",
+  "repository": "https://github.com/anrinion/tampermonkey-dev-skill",
   "license": "MIT",
   "keywords": [
     "tampermonkey",

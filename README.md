@@ -25,6 +25,16 @@ claude plugin marketplace add anrinion/tampermonkey-dev-skill
 claude plugin install userscripts@tampermonkey-dev-skill
 ```
 
+The skill alone can also be installed with the [skills CLI](https://skills.sh), for Claude Code or
+other agents:
+
+```sh
+npx skills add anrinion/tampermonkey-dev-skill
+```
+
+In that case the tampermonkey-mcp server is not configured automatically; add it to your agent's MCP
+configuration (command `npx -y tampermonkey-mcp@latest`).
+
 ## Usage
 
 1. Start Claude Code with `claude --chrome`, or enable Claude in Chrome by default via `/chrome`.
