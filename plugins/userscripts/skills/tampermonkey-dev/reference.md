@@ -7,8 +7,8 @@ Tested with tampermonkey-mcp 0.0.5, Tampermonkey 5.5.1, Tampermonkey Editors 1.0
 - Paths: `<uuid>/source` (script), `<uuid>/storage` (all GM values as one JSON object; `get`/`patch`
   both work, handy for seeding test state), `<uuid>/external/<url-encoded>` (`@require` files).
 - `get` appends `\n---\nLast modified: <ISO date>` to the content. Strip it before saving or diffing.
-- `patch` replaces the whole file; it takes effect on the next page load. Each push re-sends the full
-  source, so batch your edits.
+- `patch` replaces the whole file; it takes effect on the next page load. Push scripts with
+  `scripts/tm.mjs push` rather than `patch` (see SKILL.md).
 - `put` / `delete` need Tampermonkey 5.6+. Before that they return `405 Method Not Allowed`, even though
   they're listed. To create a script, have the user make an empty stub (dashboard → **+** → **Ctrl+S**),
   find it with `list`, then `patch` it, header included. Deleting stays manual.
@@ -19,6 +19,20 @@ Tested with tampermonkey-mcp 0.0.5, Tampermonkey 5.5.1, Tampermonkey Editors 1.0
 - If the extension can't connect: same browser profile as Claude in Chrome? A code from this session?
   On macOS, `localhost` IPv4/IPv6 mismatch causes random failures (upstream PR #13). WSL2 works with
   mirrored networking.
+
+## The shared daemon
+
+- `scripts/bridge.mjs` is the plugin's MCP server: it forwards to `scripts/daemon.mjs`, one long-lived
+  tampermonkey-mcp (the unmodified npm package, run via `npx -p`) on `127.0.0.1:47801`. `tm.mjs` uses
+  the same daemon. Either one starts it when it isn't running.
+- Port: `TAMPERMONKEY_MCP_PORT`. Log: `$TMPDIR/tampermonkey-mcp-<port>.log`. Health:
+  `curl 127.0.0.1:47801/health` (pid, package version).
+- The connection code changes only when the daemon restarts (reboot, WSL shutdown, killed). Stop it
+  with `kill <pid>` from `/health`; the next call starts a fresh one, which needs a new code.
+- Local clients only: requests with an `Origin` header (any browser) or a `Host` other than
+  `127.0.0.1`/`localhost` get 403, so web pages can't reach it, DNS rebinding included.
+- The daemon raises the request size limit to 50 MB; the package's own `--transport=http` keeps
+  express's 100 KB default, too small for large scripts.
 
 ## Claude in Chrome
 

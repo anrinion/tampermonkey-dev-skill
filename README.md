@@ -6,14 +6,15 @@ Claude edits the script file, writes it into your installed Tampermonkey through
 [tampermonkey-mcp](https://github.com/Tampermonkey/tampermonkey-mcp), reloads the target page in your
 browser through [Claude in Chrome](https://code.claude.com/docs/en/chrome) and checks the result (page
 content, console errors, GM storage) before the next iteration. The plugin consists of a skill describing
-this workflow and the tampermonkey-mcp server configuration.
+this workflow, the tampermonkey-mcp server configuration and a small command line tool for pushing
+scripts from disk.
 
 ## Requirements
 
 - Claude Code with Claude in Chrome set up. See the
   [official instructions](https://code.claude.com/docs/en/chrome) for the extension, supported browsers
   and plans.
-- Node.js, to run tampermonkey-mcp via `npx`.
+- Node.js 22 or later, to run tampermonkey-mcp via `npx`.
 - [Tampermonkey](https://www.tampermonkey.net/) 5.5 or later and
   [Tampermonkey Editors](https://chrome.google.com/webstore/detail/tampermonkey-editors/lieodnapokbjkkdkhdljlllmgkmdokcm),
   installed in the same browser profile that Claude in Chrome controls.
@@ -33,7 +34,7 @@ npx skills add anrinion/tampermonkey-dev-skill
 ```
 
 In that case the tampermonkey-mcp server is not configured automatically; add it to your agent's MCP
-configuration (command `npx -y tampermonkey-mcp@0.0.5`).
+configuration (command `node <skill dir>/scripts/bridge.mjs`, or plain `npx -y tampermonkey-mcp@0.0.5`).
 
 ## Usage
 
@@ -41,12 +42,26 @@ configuration (command `npx -y tampermonkey-mcp@0.0.5`).
 2. Describe the change, e.g. "my AliExpress Filter script hides every card since the last site update,
    fix it". The skill is selected automatically; it can also be invoked as
    `/userscripts:tampermonkey-dev`.
-3. Once per session, Claude gives you a connection code. Open Tampermonkey Editors and type it into the
-   "Connection code" field.
+3. The first time (and after a reboot), Claude gives you a connection code. Open Tampermonkey Editors
+   and type it into the "Connection code" field.
 
 Without Claude in Chrome, Claude still writes the script into Tampermonkey and asks you to check the
 page. Without tampermonkey-mcp, it tests by injecting the script into the page and you install the
 result manually.
+
+## How it connects
+
+All Claude Code sessions share one local tampermonkey-mcp server (the unmodified npm package), started
+in the background on first use and listening on `127.0.0.1:47801`. The plugin's MCP server is a small
+bridge to it, and `scripts/tm.mjs` lets Claude push a script straight from disk. That matters for
+speed: passing a script's source through a tool call means Claude generates every character of it,
+minutes for a large script, while `tm.mjs push` takes about a second. Because the server outlives the
+sessions, the connection code stays valid until it stops (reboot, WSL shutdown). Set
+`TAMPERMONKEY_MCP_PORT` to use another port.
+
+The server only listens on `127.0.0.1` and refuses requests coming from a browser (any request with
+an `Origin` header, or for a host name other than `127.0.0.1`/`localhost`), so websites can't reach
+it. To stop it, kill the process id shown by `curl 127.0.0.1:47801/health`.
 
 ## Limitations
 

@@ -7,14 +7,30 @@ compatibility: Claude Code with the tampermonkey-mcp server and Claude in Chrome
 
 # Live userscript development
 
-Loop: edit the local file → `tampermonkey_patch` it into the user's real Tampermonkey → reload the real
-page in Claude in Chrome → measure → repeat. The script runs with the real manager, so `GM_*`, `@grant`,
+Loop: edit the local file → push it into the user's real Tampermonkey → reload the real page in Claude
+in Chrome → measure → repeat. The script runs with the real manager, so `GM_*`, `@grant`,
 `@run-at` and logged-in sessions behave as in daily use. Tool quirks and snippets:
 [reference.md](reference.md).
 
-## Connect (once per session)
+## Push from disk, never through a tool argument
 
-Call `tampermonkey_get_connection_code`, send the user this as a message of its own, then **end your
+Write the local file into Tampermonkey with Bash, from this skill's base directory:
+
+```sh
+node <skill dir>/scripts/tm.mjs push path/to/script.user.js   # finds the installed script by @name
+node <skill dir>/scripts/tm.mjs pull "<@name>" /tmp/installed.user.js   # installed copy, for diffs
+```
+
+**Don't** pass a script's source to `tampermonkey_patch`, and don't `tampermonkey_get` a large one into
+the conversation: every character of a tool argument is generated output, so a 70 KB script takes
+minutes per push. Use the MCP tools for `list`, connection codes, small files and GM storage.
+`push` takes an explicit `<uuid>/source` as second argument when names are ambiguous.
+
+## Connect (once, not per session)
+
+All sessions share one local tampermonkey-mcp daemon, started on demand, so the connection usually
+survives from earlier sessions. Try `tampermonkey_list` first. Only if it says "Not connected", call
+`tampermonkey_get_connection_code`, send the user this as a message of its own, then **end your
 turn and wait**. Don't assume the extensions are installed; answer setup questions before doing anything else.
 
 > **Connect Tampermonkey**: code **`<code>`**
